@@ -11,6 +11,7 @@ Before running you need:
 1. AWS Account
 2. Create user for serverless - https://www.youtube.com/watch?v=tgb_MRVylWw&ab_channel=SimplyExplained (I do not recommend God Mode for Serverless in PROD)
 3. Update your `.aws/credentials`
+4. Enter your accounntId in config files for each service
 
 Running:
 1. `cd` into every folder in `serverless` (`client-service`, `consumer-service`, `message-service`).
