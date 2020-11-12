@@ -1,0 +1,49 @@
+service:
+  name: consumer-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${file(./config.js):region}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+      Resource: arn:aws:sqs:${file(./config.js):region}:${file(./config.js):accountId}:${file(./config.js):queueName}
+    - Effect: Allow
+      Action:
+        - "sns:*"
+      Resource: "*"
+
+    - Effect: Allow
+      Action:
+        - dynamodb:UpdateItem
+      Resource: "arn:aws:dynamodb:*"
+      
+functions:
+  consumer:
+    handler: handler.consumer
+    events:
+      - sqs:
+          arn: arn:aws:sqs:${file(./config.js):region}:${file(./config.js):accountId}:${file(./config.js):queueName}
+
+resources:
+  Resources:
+    receiverQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${file(./config.js):queueName}
+    userData:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${file(./config.js):dynamoTable}

@@ -1,0 +1,22 @@
+service:
+  name:  message-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${file(./config.js):region}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource: "*"
+      
+functions:
+  email-send:
+    handler: handler.emailSend
+    events:
+      - sns: ${file(./config.js):snsTopicEmails}
+  sms-send:
+    handler: handler.smsSend
+    events:
+      - sns: ${file(./config.js):snsTopicSMS}
